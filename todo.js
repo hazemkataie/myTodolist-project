@@ -12,7 +12,45 @@ eventListeners();
 function eventListeners() {
     form.addEventListener("submit", addTodo);
     document.addEventListener("DOMContentLoaded",loadAllTodosToUI);
+    SecondCardBody.addEventListener("click",deleteTodo);
+    filter.addEventListener("keydown",filterTodos);
+}
 
+function filterTodos(e){
+   const filterValue = e.target.value.toLowerCase();
+   const listItems = document.querySelectorAll(".list-group-item");
+   listItems.forEach(function(listItem){
+        const text = listItem.textContent.toLowerCase();
+        if (text.indexOf(filterValue) === -1) {
+            // Bulamadı
+            listItem.setAttribute("style","display : none !important");
+        }
+        else {
+            listItem.setAttribute("style","display : block");
+        }
+
+   });
+}
+
+function deleteTodo(e){
+    if (e.target.className === "fa fa-remove"){
+    e.target.parentElement.parentElement.remove();
+    deleteTodoFromStorage(e.target.parentElement.parentElement.textContent);
+    showAlert("primary","Todo başarılı bir şekilde silinmiştir.");
+    }
+}
+
+function deleteTodoFromStorage(deletetodo){
+    let todos = getTodosFromStorage();
+
+    todos.forEach(function(todo,index){
+        if (todo === deletetodo){
+           todos.splice(index,1); // Arrayden değeri silebiliriz.
+        }
+
+    });
+
+    localStorage.setItem("todos",JSON.stringify(todos));
 }
 
 function loadAllTodosToUI(){
@@ -81,4 +119,3 @@ function addTodoToUI(newTodo) { //string değerini list item olarak UI'ya ekleye
     todoList.appendChild(listItem);
     todoInput.value = "";
 }
-

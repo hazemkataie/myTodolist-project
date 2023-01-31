@@ -14,6 +14,16 @@ function eventListeners() {
     document.addEventListener("DOMContentLoaded",loadAllTodosToUI);
     SecondCardBody.addEventListener("click",deleteTodo);
     filter.addEventListener("keydown",filterTodos);
+    clearButton.addEventListener("click",clearAllTodos);
+}
+
+function clearAllTodos(e){
+    if (confirm("Tümünü silmek istediğiniizden emin misiniz?")) {
+        while (todoList.firstElementChild != null) {
+            todoList.removeChild(todoList.firstElementChild);
+        }
+    }
+    localStorage.removeItem("todos");
 }
 
 function filterTodos(e){
@@ -28,7 +38,6 @@ function filterTodos(e){
         else {
             listItem.setAttribute("style","display : block");
         }
-
    });
 }
 
@@ -42,22 +51,18 @@ function deleteTodo(e){
 
 function deleteTodoFromStorage(deletetodo){
     let todos = getTodosFromStorage();
-
     todos.forEach(function(todo,index){
         if (todo === deletetodo){
            todos.splice(index,1); // Arrayden değeri silebiliriz.
         }
-
     });
-
     localStorage.setItem("todos",JSON.stringify(todos));
 }
 
 function loadAllTodosToUI(){
     let todos = getTodosFromStorage();
     todos.forEach(function(todo){
-        addTodoToUI(todo);
-        
+    addTodoToUI(todo);    
     })
 }
 
@@ -67,9 +72,15 @@ function addTodo(e) {
         showAlert("danger", "Lütfen bir TODO giriniz.");
     }
     else {
-        addTodoToUI(newTodo);
-        addTodoToStorage(newTodo);
-        showAlert("success","Todo başarılı bir şekilde eklendi.");
+        let todos = getTodosFromStorage();
+        if(todos.indexOf(newTodo)===-1){
+            addTodoToUI(newTodo);  
+            addTodoToStorage(newTodo);
+            showAlert("success","Başarılı bir şekilde eklendi...")  
+         }
+    else {
+        showAlert("danger","Bu Todo Zaten Kayıtlı");
+         }
     }
     e.preventDefault();
 }
@@ -89,7 +100,6 @@ function addTodoToStorage(newTodo){
     let todos = getTodosFromStorage();
     todos.push(newTodo);
     localStorage.setItem("todos",JSON.stringify(todos));
-
 }
 
 function showAlert(type,message) {
@@ -110,7 +120,6 @@ function addTodoToUI(newTodo) { //string değerini list item olarak UI'ya ekleye
     link.href = '#';
     link.className = "delete-item";
     link.innerHTML = "<i class = 'fa fa-remove'></i>";
-
     listItem.className = "list-group-item d-flex justify-content-between";
     //Text Node Ekleme
     listItem.appendChild(document.createTextNode(newTodo));
